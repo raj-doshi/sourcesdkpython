@@ -15,7 +15,6 @@
 #pragma once
 #endif
 
-#include <vector>
 
 #define HandlePythonException() {PyErr_Print();AssertMsg(false, "Python script exception!\n");}
 
@@ -30,8 +29,6 @@ protected:
 	virtual void Init()=0;
 	virtual void Shutdown()=0;
 
-	void InitDll();
-	void ShutdownDll();
 
 	//this needs to be called in the child class constructor
 	void Register();
@@ -44,6 +41,8 @@ protected:
 private:
 	bp::object m_oDict;
 	bool m_bStarted;
+	void InitHandle();
+	void ShutdownHandle();
 
 	friend class CGEPYManager;
 };
@@ -76,8 +75,9 @@ private:
 	bp::object main_module;
 	bp::object main_namespace;
 
-	std::vector<PyHandle*> m_vHandles;
+	CUtlVector<PyHandle*> m_vHandles;
 	bool m_bInit;
+	bool m_bHandleInit;
 };
 
 extern CGEPYManager* GEPython();
