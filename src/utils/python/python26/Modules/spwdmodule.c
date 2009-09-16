@@ -170,6 +170,7 @@ static PyMethodDef spwd_methods[] = {
 PyMODINIT_FUNC
 initspwd(void)
 {
+#ifdef HAVE_GETSPENT
 	PyObject *m;
 	m=Py_InitModule3("spwd", spwd_methods, spwd__doc__);
 	if (m == NULL)
@@ -180,4 +181,5 @@ initspwd(void)
 	Py_INCREF((PyObject *) &StructSpwdType);
 	PyModule_AddObject(m, "struct_spwd", (PyObject *) &StructSpwdType);
 	initialized = 1;
+#endif
 }
