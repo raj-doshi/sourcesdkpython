@@ -1,7 +1,11 @@
 #ifndef Py_PYPORT_H
 #define Py_PYPORT_H
 
-#include "pyconfig.h" /* include for defines */
+#ifdef _LINUX
+#include "pyconfig_linux.h"
+#else
+#include "pyconfig.h"
+#endif
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>

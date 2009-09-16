@@ -5,7 +5,11 @@
 /* Include nearly all Python header files */
 
 #include "patchlevel.h"
+#ifdef _LINUX
+#include "pyconfig_linux.h"
+#else
 #include "pyconfig.h"
+#endif
 #include "pymacconfig.h"
 
 /* Cyclic gc is always enabled, starting with release 2.3a1.  Supply the
