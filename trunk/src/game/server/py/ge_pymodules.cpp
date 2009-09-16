@@ -29,7 +29,7 @@ void pyWarning(const char* msg)
 	Warning(msg);
 }
 
-BOOST_PYTHON_MODULE(GEUtil)
+BOOST_PYTHON_MODULE(HLUtil)
 {
 	bp::def("Msg", pyMsg);
 	bp::def("Warning", pyWarning);
