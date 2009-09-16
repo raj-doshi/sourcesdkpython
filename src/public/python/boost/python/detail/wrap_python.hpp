@@ -47,7 +47,11 @@
 # endif
 #endif
 
-# include <pyconfig.h>
+#ifdef _LINUX
+#include <pyconfig_linux.h>
+#else
+#include <pyconfig.h>
+#endif
 # if defined(_SGI_COMPILER_VERSION) && _SGI_COMPILER_VERSION >= 740
 #  undef _POSIX_C_SOURCE
 #  undef _XOPEN_SOURCE

@@ -35,7 +35,11 @@
 /* Include nearly all Python header files */
 
 #include "patchlevel.h"
+#ifdef _LINUX
+#include "pyconfig_linux.h"
+#else
 #include "pyconfig.h"
+#endif
 
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
