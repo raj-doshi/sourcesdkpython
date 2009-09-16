@@ -160,6 +160,18 @@ void CGEPYManager::InitDll()
 			HandlePythonException();
 		}
 
+#if defined (WINGDBG) && (DEBUG)
+		try
+		{
+			Exec("import wingdbstub");
+		}
+		catch (...)
+		{
+			Warning("Failed to import python debugger\n");
+			HandlePythonException();
+		}
+#endif		
+		
 
 		m_bInit = true;
 	}
