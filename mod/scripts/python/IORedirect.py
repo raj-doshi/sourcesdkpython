@@ -1,4 +1,4 @@
-import HLUtil
+import GEUtil
 import sys
 
 class OutputCatcher:
@@ -6,10 +6,11 @@ class OutputCatcher:
 		self.data=''
 		
 	def write(self, stuff):
-		HLUtil.Msg(stuff)	
+		GEUtil.Msg(stuff)	
 
 oc = OutputCatcher();		
 sys.stdout = oc	
+sys.__stdout__ = oc	
 
 
 class OutputErrCatcher:
@@ -17,8 +18,9 @@ class OutputErrCatcher:
 		self.data=''
 		
 	def write(self, stuff):
-		HLUtil.Warning(stuff)
+		GEUtil.Warning(stuff)
 
 
 oec = OutputErrCatcher();
 sys.stderr = oec
+sys.__stderr__ = oec

@@ -16,7 +16,21 @@
 #endif
 
 
-#define HandlePythonException() {PyErr_Print();AssertMsg(false, "Python script exception!\n");}
+#if defined (WINGDBG) && (DEBUG)
+	#define HandlePythonException() {PyErr_Print();}
+
+#else
+	#define HandlePythonException() {PyErr_Print();AssertMsg(false, "Python script exception!\n");}
+
+	extern "C" void inittdbgtracer(void)
+	{
+	}
+
+#endif
+
+
+#define TRYFUNCRET( call, def ) try{ return call; }catch(...){HandlePythonException();return def;}
+#define TRYFUNC( call ) try{ call; }catch(...){HandlePythonException();}
 
 
 class PyHandle

@@ -10,13 +10,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "cbase.h"
+#include "ge_pymanager.h"
 
 #include <boost/python.hpp>
 namespace bp = boost::python;
  
-#define TRYFUNCRET( call, def ) try{ return call; }catch(...){HandlePythonException();return def;}
-#define TRYFUNC( call ) try{ call; }catch(...){HandlePythonException();}
- 
+
  
 pythExample::pythExample()
 {
