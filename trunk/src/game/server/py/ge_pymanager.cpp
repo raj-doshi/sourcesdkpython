@@ -11,7 +11,6 @@
 
 #include "cbase.h"
 #include "filesystem.h"
-#include <string>
 
 #include <boost/python.hpp>
 namespace bp = boost::python;
@@ -79,7 +78,7 @@ void PyHandle::Register()
 	GEPython()->RegisterHandle(this);
 }
 
-void PyHandle::InitDll()
+void PyHandle::InitHandle()
 {
 	if ( m_bStarted )
 		return;
@@ -87,15 +86,16 @@ void PyHandle::InitDll()
 	m_bStarted = true;
 
 	m_oDict = bp::object(bp::handle<>( PyDict_Copy( GEPython()->GetGloablDict().ptr() )));
+	Init();
 }
 
-void PyHandle::ShutdownDll()
+void PyHandle::ShutdownHandle()
 {
 	if ( !m_bStarted )
 		return;
 
 	Shutdown();
-	m_bStarted = false;
+	delete this;
 }
 
 bp::object PyHandle::Exec(const char* buff)
@@ -105,12 +105,12 @@ bp::object PyHandle::Exec(const char* buff)
 
 bp::object PyHandle::ExecFile(const char* file)
 {
-	std::string path(GEPython()->GetRootPath());
-	path += "\\";
-	path += file;
+	char pf[255];
+
+	Q_snprintf(pf, 255, "%s\\%s", GEPython()->GetRootPath(), file);
 
 	char fullPath[255];
-	filesystem->RelativePathToFullPath( path.c_str(), "MOD", fullPath, 255);
+	filesystem->RelativePathToFullPath( pf, "MOD", fullPath, 255);
 
 	return bp::exec_file(fullPath, GetDict(), GetDict());
 }
@@ -123,6 +123,7 @@ bp::object PyHandle::ExecFile(const char* file)
 CGEPYManager::CGEPYManager()
 {
 	m_bInit = false;
+	m_bHandleInit = false;
 }
 
 CGEPYManager::~CGEPYManager()
@@ -141,7 +142,6 @@ void CGEPYManager::InitDll()
 		filesystem->RelativePathToFullPath(GetRootPath(), "MOD", filePath, sizeof(filePath) );
 		Py_SetPythonHome(filePath);
 
-		PyImport_AppendInittab( "GEDev", initGEDev );
 		RegisterPythonModules();
 		Py_Initialize();
 
@@ -160,8 +160,6 @@ void CGEPYManager::InitDll()
 			HandlePythonException();
 		}
 
-		for (size_t x=0; x<m_vHandles.size(); x++)
-			m_vHandles[x]->InitDll();
 
 		m_bInit = true;
 	}
@@ -177,10 +175,7 @@ void CGEPYManager::ShutdownDll()
 	if ( !m_bInit )
 		return;
 
-	for (size_t x=0; x<m_vHandles.size(); x++)
-	{
-		m_vHandles[x]->ShutdownDll();
-	}
+	ShutdownHandles();
 
 	m_bInit = false;
 
@@ -189,18 +184,29 @@ void CGEPYManager::ShutdownDll()
 
 void CGEPYManager::InitHandles( void )
 {
-	for (size_t x=0; x<m_vHandles.size(); x++)
+	if ( !m_bInit || m_bHandleInit )
 	{
-		m_vHandles[x]->Init();
+		Assert(false);
+		return;
 	}
+
+	for (int x=0; x<m_vHandles.Size(); x++)
+	{
+		m_vHandles[x]->InitHandle();
+	}
+
+	m_bHandleInit = true;
 }
 
 void CGEPYManager::ShutdownHandles( void )
 {
-	for (size_t x=0; x<m_vHandles.size(); x++)
+	//hnadles will removet them selfs as we go along the list
+	for (int x=m_vHandles.Size()-1; x >= 0; x--)
 	{
-		m_vHandles[x]->Shutdown();
+		m_vHandles[x]->ShutdownHandle();
 	}
+
+	m_bHandleInit = false;
 }
 
 void CGEPYManager::DeRegisterHandle(PyHandle* handle)
@@ -208,11 +214,11 @@ void CGEPYManager::DeRegisterHandle(PyHandle* handle)
 	if (!handle)
 		return;
 	
-	for (size_t x=0; x<m_vHandles.size(); x++)
+	for (int x=0; x<m_vHandles.Size(); x++)
 	{
 		if (m_vHandles[x]==handle)
 		{
-			m_vHandles.erase(m_vHandles.begin()+x);
+			m_vHandles.Remove(x);
 			break;
 		}
 	}
@@ -223,17 +229,17 @@ void CGEPYManager::RegisterHandle(PyHandle* handle)
 	if (!handle)
 		return;
 
-	for (size_t x=0; x<m_vHandles.size(); x++)
+	for (int x=0; x<m_vHandles.Size(); x++)
 	{
 		if (m_vHandles[x]==handle)
 			return;
 	}
 
-	m_vHandles.push_back(handle);
+	m_vHandles.AddToTail(handle);
 
 	//if we are late to the game
-	if (m_bInit)
-		handle->InitDll();
+	if (m_bHandleInit)
+		handle->InitHandle();
 }
 
 bp::object CGEPYManager::Exec(const char* buff)
@@ -243,12 +249,12 @@ bp::object CGEPYManager::Exec(const char* buff)
 
 bp::object CGEPYManager::ExecFile(const char* name)
 {
-	std::string path(GetRootPath());
-	path += "\\";
-	path += name;
+	char file[255];
+
+	Q_snprintf(file, 255, "%s\\%s", GEPython()->GetRootPath(), file);
 
 	char fullPath[255];
-	filesystem->RelativePathToFullPath( path.c_str(), "MOD", fullPath, 255);
+	filesystem->RelativePathToFullPath( file, "MOD", fullPath, 255);
 
 	return bp::exec_file(fullPath, GetGloablDict(), GetGloablDict());
 }
