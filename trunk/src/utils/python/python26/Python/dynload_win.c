@@ -190,11 +190,11 @@ dl_funcptr _PyImport_GetDynLoadFunc(const char *fqname, const char *shortname,
 				    sizeof(pathbuf),
 				    pathbuf,
 				    &dummy)) {
-			ULONG_PTR cookie = _Py_ActivateActCtx();
+			//ULONG_PTR cookie = _Py_ActivateActCtx();
 			/* XXX This call doesn't exist in Windows CE */
 			hDLL = LoadLibraryEx(pathname, NULL,
 					     LOAD_WITH_ALTERED_SEARCH_PATH);
-			_Py_DeactivateActCtx(cookie);
+			//_Py_DeactivateActCtx(cookie);
 		}
 
 		/* restore old error mode settings */

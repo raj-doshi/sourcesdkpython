@@ -34,6 +34,13 @@ extern void initcPickle(void);
 extern void initmsvcrt(void);
 extern void init_locale(void);
 #endif
+
+#ifdef _DEBUG
+extern void init_socket(void);
+extern void initselect(void);
+extern void inittdbgtracer(void);
+#endif
+
 extern void init_codecs(void);
 extern void init_weakref(void);
 extern void init_hotshot(void);
@@ -112,6 +119,13 @@ struct _inittab _PyImport_Inittab[] = {
         {"msvcrt", initmsvcrt},
         {"_locale", init_locale},
 #endif
+
+#ifdef _DEBUG
+		{"_socket", init_socket},
+		{"select", initselect},
+		{"tdbgtracer", inittdbgtracer},
+#endif
+
 	/* XXX Should _subprocess go in a WIN32 block?  not WIN64? */
 	{"_subprocess", init_subprocess},
 
@@ -140,7 +154,7 @@ struct _inittab _PyImport_Inittab[] = {
 	{"xxsubtype", initxxsubtype},
 	{"zipimport", initzipimport},
 	{"zlib", initzlib},
-	
+
 	/* CJK codecs */
 	{"_multibytecodec", init_multibytecodec},
 	{"_codecs_cn", init_codecs_cn},
