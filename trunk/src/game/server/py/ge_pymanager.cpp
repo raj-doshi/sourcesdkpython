@@ -263,7 +263,7 @@ bp::object CGEPYManager::ExecFile(const char* name)
 {
 	char file[255];
 
-	Q_snprintf(file, 255, "%s\\%s", GEPython()->GetRootPath(), file);
+	Q_snprintf(file, 255, "%s\\%s", GEPython()->GetRootPath(), name);
 
 	char fullPath[255];
 	filesystem->RelativePathToFullPath( file, "MOD", fullPath, 255);
